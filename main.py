@@ -26,3 +26,6 @@ def predict(input : Input):
     img = get_img(input.encoded_img)
     caption=api.predict_caption(img)
     return {"caption":caption}
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='127.0.0.1', port=8000)
