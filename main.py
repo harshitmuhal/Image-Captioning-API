@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from services import api
+# from services import api
 from pydantic import BaseModel
 from PIL import Image
-import base64,io
+import base64,io,uvicorn
 
 app =FastAPI()
 
@@ -24,8 +24,8 @@ def get_img(encoded_img):
 @app.post('/predict')
 def predict(input : Input):
     img = get_img(input.encoded_img)
-    caption=api.predict_caption(img)
-    return {"caption":caption}
+    # caption=api.predict_caption(img)
+    # return {"caption":caption}
 
 if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8000)
