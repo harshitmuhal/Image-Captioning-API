@@ -6,10 +6,10 @@ import base64,io,uvicorn
 
 import numpy as np
 import re, json,pickle ,keras
-from keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
-from keras.preprocessing import image
-from keras.models import Model, load_model, model_from_json
-from keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.models import Model, load_model, model_from_json
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -45,7 +45,7 @@ def predict_caption(img):
     json_file.close()
     model = model_from_json(loaded_model_json)
     model.load_weights('services/model_weights/model_final.h5')
-    
+
     # preprocessing
     img = image.img_to_array(img)
     img = img.reshape((1,224,224,3))
