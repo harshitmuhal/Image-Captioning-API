@@ -23,7 +23,8 @@ def init():
     model = model_from_json(loaded_model_json)
     model.load_weights('services/model_weights/model_final.h5')
 
-def predict_caption(img_path):
+def predict_caption(img):
+    init()
     # preprocessing
     img = image.img_to_array(img)
     img = img.reshape((1,224,224,3))
