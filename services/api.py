@@ -7,39 +7,34 @@ from keras.preprocessing.sequence import pad_sequences
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-model = ResNet50(weights="imagenet",input_shape=(224,224,3))
-new_model = Model(model.input,model.layers[-2].output)
+def init():
+    # Resnet model
+    model = ResNet50(weights="imagenet",input_shape=(224,224,3))
+    new_model = Model(model.input,model.layers[-2].output)
+    # vocabulary
+    with open("services/word_to_idx.pkl","rb") as f:
+        word_to_idx=pickle.load(f)
+    with open("services/idx_to_word.pkl","rb") as f:
+        idx_to_word=pickle.load(f)
+    # Main Model
+    json_file = open('services/model.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    model = model_from_json(loaded_model_json)
+    model.load_weights('services/model_weights/model_final.h5')
 
-def get_image_encodings(img):
-    feature_vector = new_model.predict(img)
-    feature_vector = feature_vector.reshape((-1,))
-    return feature_vector
-
-def preprocessing(img):
-    # img = image.load_img(img_path,target_size=(224,224))
+def predict_caption(img_path):
+    # preprocessing
     img = image.img_to_array(img)
     img = img.reshape((1,224,224,3))
     img = preprocess_input(img)
-    return get_image_encodings(img)
-
-with open("services/word_to_idx.pkl","rb") as f:
-    word_to_idx=pickle.load(f)
-with open("services/idx_to_word.pkl","rb") as f:
-    idx_to_word=pickle.load(f)
-
-max_len = 37
-
-json_file = open('services/model.json', 'r')
-loaded_model_json = json_file.read()
-json_file.close()
-model = model_from_json(loaded_model_json)
-
-model.load_weights('services/model_weights/model_final.h5')
-
-def predict_caption(img_path):
-    photo=preprocessing(img_path)
-    photo=photo.reshape((1,2048))
+    # encoding images
+    feature_vector = new_model.predict(img)
+    feature_vector = feature_vector.reshape((-1,))
+    photo=feature_vector.reshape((1,2048))
+    # Finding caption
     in_text = '<start>'
+    max_len = 37
     for i in range(max_len):
         sequence = [word_to_idx[w] for w in in_text.split() if w in word_to_idx]
         sequence = pad_sequences([sequence], maxlen=max_len,padding='post')
